@@ -22,7 +22,6 @@ export default function List() {
 				<Card />
 				<Card />
 				<Card />
-				<Card />
 			</ul>
 		</ Container>
 	);
