@@ -7,7 +7,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import initialData from './initial-data';
 import Column from './column';
 
-const Container=styled.div`
+const Container = styled.div`
 	display:flex;
 `
 
@@ -28,7 +28,7 @@ root.render(
 const saveData = (data, filePath) => {
 
 	const finished = (error) => {
-		if(error){
+		if (error) {
 			console.log(error);
 			return;
 		}
@@ -44,9 +44,9 @@ const getInitialData = () => {
 
 	let data = localStorage.getItem("testBoard");
 
-	if(data == null){
+	if (data == null) {
 		data = initialData;
-	}else{
+	} else {
 		data = JSON.parse(data);
 	}
 
@@ -58,12 +58,25 @@ class App extends React.Component {
 	state = initialData;
 	//state = getInitialData();
 
-	onDragStart = () =>{
+	onDragStart = start => {
+		//DragStart color logic
 		/*document.body.style.color='orange';
 		document.body.style.transition='background-color 0.2s ease';*/
+		
+		const homeIndex = this.state.columnOrder.indexOf(start.source.droppableId);
+		this.setState({
+			homeIndex,
+		});
 	}
 
+
+
 	onDragEnd = result => {
+		this.setState({
+			homeIndex: null,
+		});
+
+
 		document.body.style.color = 'inherit';
 		document.body.style.backgroundColor = 'inherit';
 
@@ -140,12 +153,14 @@ class App extends React.Component {
 				onDragEnd={this.onDragEnd}
 			>
 				<Container>
-					{this.state.columnOrder.map(columnId => {
+					{this.state.columnOrder.map((columnId, index) => {
 						const column = this.state.columns[columnId];
 						const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
 
+						const isDropDisabled = index < this.state.homeIndex;
+
 						//return column.title;
-						return <Column key={column.id} column={column} tasks={tasks} />;
+						return <Column key={column.id} column={column} tasks={tasks} isDropDisabled={isDropDisabled} />;
 					})}
 				</Container>
 			</DragDropContext>
