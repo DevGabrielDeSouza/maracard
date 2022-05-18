@@ -11,6 +11,26 @@ const Container = styled.div`
 	display:flex;
 `
 
+class InnerList extends React.PureComponent {
+	//React.PureComponent already does this
+	/*shouldComponentUpdate(nextProps) {
+		if (
+			nextProps.column === this.props.column &&
+			nextProps.taskMap === this.props.taskMap &&
+			nextProps.index === this.props.index
+		) {
+			return false;
+		}
+		return true;
+	}*/
+
+	render() {
+		const { column, taskMap, index } = this.props;
+		const tasks = column.taskIds.map(taskId => taskMap[taskId]);
+		return <Column column={column} tasks={tasks} index={index} />;
+	}
+}
+
 //import App from './App';
 
 /*
@@ -62,7 +82,7 @@ class App extends React.Component {
 		//DragStart color logic
 		/*document.body.style.color='orange';
 		document.body.style.transition='background-color 0.2s ease';*/
-		
+
 		const homeIndex = this.state.columnOrder.indexOf(start.source.droppableId);
 		this.setState({
 			homeIndex,
@@ -93,7 +113,7 @@ class App extends React.Component {
 			return;
 		}
 
-		if(type === 'column') {
+		if (type === 'column') {
 			const newColumnOrder = Array.from(this.state.columnOrder);
 			newColumnOrder.splice(source.index, 1);
 			newColumnOrder.splice(destination.index, 0, draggableId);
@@ -106,7 +126,7 @@ class App extends React.Component {
 			this.setState(newState);
 			saveData(newState, 'data.json');
 			return;
-			
+
 		}
 
 		const start = this.state.columns[source.droppableId];
@@ -168,9 +188,9 @@ class App extends React.Component {
 				onDragUpdate={this.onDragUpdate}
 				onDragEnd={this.onDragEnd}
 			>
-				<Droppable 
-					droppableId="all-columns" 
-					direction="horizontal" 
+				<Droppable
+					droppableId="all-columns"
+					direction="horizontal"
 					type="column"
 				>
 					{provided => (
@@ -180,26 +200,25 @@ class App extends React.Component {
 						>
 							{this.state.columnOrder.map((columnId, index) => {
 								const column = this.state.columns[columnId];
-								const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
 
-								
+
 								//need to only allow to move cards to the right
 								//const isDropDisabled = index < this.state.homeIndex;
 
 								//return column.title;
-								return <Column 
-									key={column.id} 
-									column={column} 
-									tasks={tasks} 
-									index={index} 
-									
-									//need to only allow to move cards to the right
-									//isDropDisabled={isDropDisabled} 
+								return <InnerList
+									key={column.id}
+									column={column}
+									taskMap={this.state.tasks}
+									index={index}
+
+								//need to only allow to move cards to the right
+								//isDropDisabled={isDropDisabled} 
 								/>;
 							})}
 							{provided.placeholder}
 						</Container>
-						)}
+					)}
 				</Droppable>
 			</DragDropContext>
 
