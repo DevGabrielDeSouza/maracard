@@ -19,8 +19,39 @@ root.render(
 
 //const App = ()=>'Hello world';
 
+
+const saveData = (data, filePath) => {
+
+	const finished = (error) => {
+		if(error){
+			console.log(error);
+			return;
+		}
+	}
+
+	const jsonData = JSON.stringify(data, null, 2);
+	//fs.writeFile(filePath, jsonData, finished);
+	localStorage.setItem("testBoard", jsonData);
+}
+
+const getInitialData = () => {
+	//return initialData;
+
+	let data = localStorage.getItem("testBoard");
+
+	if(data == null){
+		data = initialData;
+	}else{
+		data = JSON.parse(data);
+	}
+
+	console.log("data: " + data);
+	return data;
+}
+
 class App extends React.Component {
-	state = initialData;
+	//state = initialData;
+	state = getInitialData();
 
 	onDragEnd = result => {
 		const { destination, source, draggableId } = result;
@@ -54,6 +85,7 @@ class App extends React.Component {
 			},
 		};
 
+		saveData(newState, './initial-data');
 
 		this.setState(newState);
 	};
