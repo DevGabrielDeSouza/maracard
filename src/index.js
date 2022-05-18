@@ -53,7 +53,15 @@ class App extends React.Component {
 	//state = initialData;
 	state = getInitialData();
 
+	onDragStart = () =>{
+		/*document.body.style.color='orange';
+		document.body.style.transition='background-color 0.2s ease';*/
+	}
+
 	onDragEnd = result => {
+		document.body.style.color = 'inherit';
+		document.body.style.backgroundColor = 'inherit';
+
 		const { destination, source, draggableId } = result;
 
 		if (!destination) {
@@ -92,7 +100,11 @@ class App extends React.Component {
 
 	render() {
 		return (
-			<DragDropContext onDragEnd={this.onDragEnd} >
+			<DragDropContext
+				onDragStart={this.onDragStart}
+				onDragUpdate={this.onDragUpdate}
+				onDragEnd={this.onDragEnd}
+			>
 				
 				{this.state.columnOrder.map(columnId => {
 					const column = this.state.columns[columnId];
