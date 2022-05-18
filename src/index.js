@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import ReactDOM from 'react-dom';
 
 import '@atlaskit/css-reset';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import initialData from './initial-data';
 import Column from './column';
 
@@ -80,7 +80,7 @@ class App extends React.Component {
 		document.body.style.color = 'inherit';
 		document.body.style.backgroundColor = 'inherit';
 
-		const { destination, source, draggableId } = result;
+		const { destination, source, draggableId, type } = result;
 
 		if (!destination) {
 			return;
@@ -91,6 +91,22 @@ class App extends React.Component {
 			destination.index === source.index
 		) {
 			return;
+		}
+
+		if(type === 'column') {
+			const newColumnOrder = Array.from(this.state.columnOrder);
+			newColumnOrder.splice(source.index, 1);
+			newColumnOrder.splice(destination.index, 0, draggableId);
+
+			const newState = {
+				...this.state,
+				columnOrder: newColumnOrder,
+			};
+
+			this.setState(newState);
+			saveData(newState, 'data.json');
+			return;
+			
 		}
 
 		const start = this.state.columns[source.droppableId];
@@ -152,17 +168,39 @@ class App extends React.Component {
 				onDragUpdate={this.onDragUpdate}
 				onDragEnd={this.onDragEnd}
 			>
-				<Container>
-					{this.state.columnOrder.map((columnId, index) => {
-						const column = this.state.columns[columnId];
-						const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
+				<Droppable 
+					droppableId="all-columns" 
+					direction="horizontal" 
+					type="column"
+				>
+					{provided => (
+						<Container
+							{...provided.droppableProps}
+							ref={provided.innerRef}
+						>
+							{this.state.columnOrder.map((columnId, index) => {
+								const column = this.state.columns[columnId];
+								const tasks = column.taskIds.map(taskId => this.state.tasks[taskId]);
 
-						const isDropDisabled = index < this.state.homeIndex;
+								
+								//need to only allow to move cards to the right
+								//const isDropDisabled = index < this.state.homeIndex;
 
-						//return column.title;
-						return <Column key={column.id} column={column} tasks={tasks} isDropDisabled={isDropDisabled} />;
-					})}
-				</Container>
+								//return column.title;
+								return <Column 
+									key={column.id} 
+									column={column} 
+									tasks={tasks} 
+									index={index} 
+									
+									//need to only allow to move cards to the right
+									//isDropDisabled={isDropDisabled} 
+								/>;
+							})}
+							{provided.placeholder}
+						</Container>
+						)}
+				</Droppable>
 			</DragDropContext>
 
 		);
