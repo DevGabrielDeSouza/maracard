@@ -2,7 +2,7 @@ import React from 'react';
 
 import GlobalStyle from './styles/global';
 
-import TextEditor from './TextEditor';
+import TextEditor from './components/TextEditor';
 
 function App() {
 	return (
